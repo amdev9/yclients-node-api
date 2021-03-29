@@ -42,7 +42,7 @@ class YclientsApi {
     // console.log(url, config)
     // return fetch(url, config).then(r => {
 
-      
+
     //   console.log(r)
     //   if (r.ok) {
     //     console.log(r.json())
@@ -53,16 +53,16 @@ class YclientsApi {
 
   }
 
-  request($url, parameters, $method = 'GET', $auth = true) {
+  request(url, parameters, method = 'GET', auth = true) {
 
 
     console.log(parameters)
-    let headers = { 
-      'Content-Type': 'application/json', 
-      'Accept': 'application/vnd.yclients.v2+json' 
+    let headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.yclients.v2+json'
     }
 
-    if ($auth) {
+    if (auth) {
       if (!this.tokenPartner) {
         throw new Error('Не указан токен партнёра');
       }
@@ -71,18 +71,18 @@ class YclientsApi {
         ...headers,
         'Authorization': `Bearer ${this.tokenPartner}`
 
-        //.concat($auth ? `, User ${$auth}` : '')
+        //.concat( auth ? `, User  { auth}` : '')
       }
     }
 
     let options = {
-      'method': $method,
+      'method': method,
       'body': JSON.stringify(parameters),
       headers,
     }
 
-    // const additionalParams = $parameters ? "?" + querystring.stringify($parameters) : ""
-    let endpoint = $url 
+    // const additionalParams =  parameters ? "?" + querystring.stringify( parameters) : ""
+    let endpoint = url
     // + additionalParams
 
 
@@ -95,8 +95,8 @@ class YclientsApi {
   /**
    * Получаем токен пользователя по логину-паролю
    *
-   * @param string $login
-   * @param string $password
+   * @param string  login
+   * @param string  password
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/0/0/0
@@ -110,39 +110,39 @@ class YclientsApi {
   /**
     * Получаем настройки формы бронирования
     *
-    * @param integer $id
+    * @param integer  id
     * @return array
     * @access public
     * @see http://docs.yclients.apiary.io/#reference/-/0/0
     * @throws YclientsException
     */
-  getBookform($id) {
-    return this.request(`bookform/${$id}`);
+  getBookform(id) {
+    return this.request(`bookform/${id}`);
   }
 
   /**
      * Получаем параметры интернационализации
      *
-     * @param string $locale - ru-RU, lv-LV, en-US, ee-EE, lt-LT, de-DE, uk-UK
+     * @param string  locale - ru-RU, lv-LV, en-US, ee-EE, lt-LT, de-DE, uk-UK
      * @return array
      * @access public
      * @see http://docs.yclients.apiary.io/#reference/-/1/0
      * @throws YclientsException
      */
-  getI18n($locale = 'ru-RU') {
-    return this.request(`i18n/${$locale}`);
+  getI18n(locale = 'ru-RU') {
+    return this.request(`i18n/${locale}`);
   }
   /**
     * Получить список услуг доступных для бронирования
     *
-    * @param integer $companyId
-    * @param integer $staffId - ID сотрудника. Фильтр по идентификатору сотрудника
-    * @param \DateTime $datetime - дата (в формате iso8601). Фильтр по дате
+    * @param integer  companyId
+    * @param integer  staffId - ID сотрудника. Фильтр по идентификатору сотрудника
+    * @param   datetime - дата (в формате iso8601). Фильтр по дате
     *                              бронирования услуги (например '2005-09-09T18:30')
-    * @param array $serviceIds - ID услуг. Фильтр по списку идентификаторов уже
+    * @param array  serviceIds - ID услуг. Фильтр по списку идентификаторов уже
     *                            выбранных (в рамках одной записи) услуг. Имеет
     *                            смысл если зада фильтр по мастеру и дате.
-    * @param array $eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
+    * @param array  eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
     *                          (в рамках одной записи) акций. Имеет смысл если зада
     *                          фильтр по мастеру и дате.
     * @return array
@@ -152,97 +152,97 @@ class YclientsApi {
     */
 
   getBookServices(
-    $companyId,
-    $staffId = null,
-    $datetime = null,
-    $serviceIds = null,
-    $eventIds = null
+    companyId,
+    staffId = null,
+    datetime = null,
+    serviceIds = null,
+    eventIds = null
   ) {
-    $parameters = [];
+    parameters = [];
 
-    if ($staffId !== null) {
-      $parameters['staff_id'] = $staffId;
+    if (staffId !== null) {
+      parameters['staff_id'] = staffIBd;
     }
 
-    if ($datetime !== null) {
-      $parameters['datetime'] = new Date($datetime) // '05 October 2011 14:48 UTC'  -> format(\DateTime:: ISO8601);
+    if (datetime !== null) {
+      parameters['datetime'] = new Date(datetime) // '05 October 2011 14:48 UTC'  -> format(:: ISO8601);
     }
 
-    if ($serviceIds !== null) {
-      $parameters['service_ids'] = $serviceIds;
+    if (serviceIds !== null) {
+      parameters['service_ids'] = serviceIds;
     }
 
-    if ($eventIds !== null) {
-      $parameters['event_ids'] = $eventIds;
+    if (eventIds !== null) {
+      parameters['event_ids'] = eventIds;
     }
 
-    return this.request(`book_services/${$companyId}`, $parameters);
+    return this.request(`book_services/${companyId}`, parameters);
   }
 
-   /**
-     * Получить список сотрудников доступных для бронирования
-     *
-     * @param integer $companyId
-     * @param integer $staffId - ID сотрудника. Фильтр по идентификатору сотрудника
-     * @param \DateTime $datetime - дата (в формате iso8601). Фильтр по дате
-     *                              бронирования услуги (например '2005-09-09T18:30')
-     * @param array $serviceIds - ID услуг. Фильтр по списку идентификаторов уже
-     *                            выбранных (в рамках одной записи) услуг. Имеет
-     *                            смысл если зада фильтр по мастеру и дате.
-     * @param array $eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
-     *                          (в рамках одной записи) акций. Имеет смысл если зада
-     *                          фильтр по мастеру и дате.
-     * @param bool $withoutSeances - Отключает выдачу ближайших свободных сеансов,
-     *                               ускоряет получение данных.
-     * @return array
-     * @access public
-     * @see http://docs.yclients.apiary.io/#reference/-/3/0
-     * @throws YclientsException
-     */
-    
-   getBookStaff(
-      $companyId,
-      $staffId = null,
-      $datetime = null, // \DateTime 
-      $serviceIds = null, // array 
-      $eventIds = null, // array 
-      $withoutSeances = false
+  /**
+    * Получить список сотрудников доступных для бронирования
+    *
+    * @param integer  companyId
+    * @param integer  staffId - ID сотрудника. Фильтр по идентификатору сотрудника
+    * @param   datetime - дата (в формате iso8601). Фильтр по дате
+    *                              бронирования услуги (например '2005-09-09T18:30')
+    * @param array  serviceIds - ID услуг. Фильтр по списку идентификаторов уже
+    *                            выбранных (в рамках одной записи) услуг. Имеет
+    *                            смысл если зада фильтр по мастеру и дате.
+    * @param array  eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
+    *                          (в рамках одной записи) акций. Имеет смысл если зада
+    *                          фильтр по мастеру и дате.
+    * @param bool  withoutSeances - Отключает выдачу ближайших свободных сеансов,
+    *                               ускоряет получение данных.
+    * @return array
+    * @access public
+    * @see http://docs.yclients.apiary.io/#reference/-/3/0
+    * @throws YclientsException
+    */
+
+  getBookStaff(
+    companyId,
+    staffId = null,
+    datetime = null, //  
+    serviceIds = null, // array 
+    eventIds = null, // array 
+    withoutSeances = false
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      if ($datetime !== null) {
-          $parameters['datetime'] = $datetime->format(\DateTime::ISO8601);
-      }
+    if (datetime !== null) {
+      parameters['datetime'] = datetime -> format(:: ISO8601);
+    }
 
-      if ($serviceIds !== null) {
-          $parameters['service_ids'] = $serviceIds;
-      }
+    if (serviceIds !== null) {
+      parameters['service_ids'] = serviceIds;
+    }
 
-      if ($eventIds !== null) {
-          $parameters['event_ids'] = $eventIds;
-      }
+    if (eventIds !== null) {
+      parameters['event_ids'] = eventIds;
+    }
 
-      if ($withoutSeances) {
-          $parameters['without_seances'] = true;
-      }
+    if (withoutSeances) {
+      parameters['without_seances'] = true;
+    }
 
-      return this.request('book_staff/' . $companyId, $parameters);
+    return this.request(`book_staff/${companyId}`, parameters);
   }
 
   /**
    * Получить список дат доступных для бронирования
    *
-   * @param integer $companyId
-   * @param integer $staffId - ID сотрудника. Фильтр по идентификатору сотрудника
-   * @param array $serviceIds - ID услуг. Фильтр по списку идентификаторов уже
+   * @param integer  companyId
+   * @param integer  staffId - ID сотрудника. Фильтр по идентификатору сотрудника
+   * @param array  serviceIds - ID услуг. Фильтр по списку идентификаторов уже
    *                            выбранных (в рамках одной записи) услуг. Имеет
    *                            смысл если зада фильтр по мастеру и дате.
-   * @param \DateTime $date - Фильтр по месяцу бронирования (например '2015-09-01')
-   * @param array $eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
+   * @param   date - Фильтр по месяцу бронирования (например '2015-09-01')
+   * @param array  eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
    *                          (в рамках одной записи) акций. Имеет смысл если зада
    *                          фильтр по мастеру и дате.
    * @return array
@@ -251,43 +251,43 @@ class YclientsApi {
    * @throws YclientsException
    */
   getBookDates(
-      $companyId,
-      $staffId = null,
-      $serviceIds = null, // array
-      $date = null, // \DateTime 
-      $eventIds = null // array
+    companyId,
+    staffId = null,
+    serviceIds = null, // array
+    date = null, //  
+    eventIds = null // array
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      if ($date !== null) {
-          // $parameters['date'] = $date->format('Y-m-d');
-      }
+    if (date !== null) {
+      //  parameters['date'] =  date->format('Y-m-d');
+    }
 
-      if ($serviceIds !== null) {
-          $parameters['service_ids'] = $serviceIds;
-      }
+    if (serviceIds !== null) {
+      parameters['service_ids'] = serviceIds;
+    }
 
-      if ($eventIds !== null) {
-          $parameters['event_ids'] = $eventIds;
-      }
+    if (eventIds !== null) {
+      parameters['event_ids'] = eventIds;
+    }
 
-      return this.request('book_dates/' . $companyId, $parameters);
+    return this.request(`book_dates/${companyId}`, parameters);
   }
 
   /**
    * Получить список сеансов доступных для бронирования
    *
-   * @param integer $companyId
-   * @param integer $staffId - ID сотрудника. Фильтр по идентификатору сотрудника
-   * @param \DateTime $date - Фильтр по месяцу бронирования (например '2015-09-01')
-   * @param array $serviceIds - ID услуг. Фильтр по списку идентификаторов уже
+   * @param integer  companyId
+   * @param integer  staffId - ID сотрудника. Фильтр по идентификатору сотрудника
+   * @param   date - Фильтр по месяцу бронирования (например '2015-09-01')
+   * @param array  serviceIds - ID услуг. Фильтр по списку идентификаторов уже
    *                            выбранных (в рамках одной записи) услуг. Имеет
    *                            смысл если зада фильтр по мастеру и дате.
-   * @param array $eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
+   * @param array  eventIds - ID акций. Фильтр по списку идентификаторов уже выбранных
    *                          (в рамках одной записи) акций. Имеет смысл если зада
    *                          фильтр по мастеру и дате.
    * @return array
@@ -296,54 +296,53 @@ class YclientsApi {
    * @throws YclientsException
    */
   getBookTimes(
-      $companyId,
-      $staffId,
-       $date, // \DateTime
-       $serviceIds = null, // array
-       $eventIds = null // array
+    companyId,
+    staffId,
+    date, // 
+    serviceIds = null, // array
+    eventIds = null // array
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($serviceIds !== null) {
-          $parameters['service_ids'] = $serviceIds;
-      }
+    if (serviceIds !== null) {
+      parameters['service_ids'] = serviceIds;
+    }
 
-      if ($eventIds !== null) {
-          $parameters['event_ids'] = $eventIds;
-      }
+    if (eventIds !== null) {
+      parameters['event_ids'] = eventIds;
+    }
 
-      return this.request('book_times/' . $companyId . '/' . $staffId . '/' . $date->format('Y-m-d'), $parameters);
+    return this.request(`book_times/${companyId}/${staffId}/${date -> format('Y-m-d')}`, parameters);
   }
 
   /**
    * Отправить СМС код подтверждения номера телефона
    *
-   * @param integer $companyId
-   * @param string $phone - Телефон, на который будет отправлен код, вида 79991234567
-   * @param string $fullname - Имя клиента
+   * @param integer  companyId
+   * @param string  phone - Телефон, на который будет отправлен код, вида 79991234567
+   * @param string  fullname - Имя клиента
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/-/6/0
    * @throws YclientsException
    */
-  postBookCode($companyId, $phone, $fullname = null)
-  {
-      $parameters = [
-          'phone' => $phone
-      ];
+  postBookCode(companyId, phone, fullname = null) {
+    parameters = [
+      'phone' => phone
+    ];
 
-      if ($fullname !== null) {
-          $parameters['fullname'] = $fullname;
-      }
+    if (fullname !== null) {
+      parameters['fullname'] = fullname;
+    }
 
-      return this.request('book_code/' . $companyId, $parameters, self::METHOD_POST);
+    return this.request(`book_code/${companyId}`, parameters,  METHOD_POST);
   }
 
   /**
    * Проверить параметры записи
    *
-   * @param integer $companyId
-   * @param array $appointments - Массив записей со следующими полями:
+   * @param integer  companyId
+   * @param array  appointments - Массив записей со следующими полями:
    *                              integer id - Идентификатор записи
    *                              array services - Массив идентификторов услуг
    *                              array events - Массив идентификторов акций
@@ -354,1102 +353,1064 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/-/7/0
    * @throws YclientsException
    */
-  postBookCheck($companyId, $appointments)
-  {
-      // проверим наличие обязательных параметров
-      foreach ($appointments as $appointment) {
-          if (!isset($appointment['id'], $appointment['staff_id'], $appointment['datetime'])) {
-              throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
-          }
+  postBookCheck(companyId, appointments) {
+    // проверим наличие обязательных параметров
+    foreach(appointments as appointment) {
+      if (!isset(appointment['id'], appointment['staff_id'], appointment['datetime'])) {
+        throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
       }
+    }
 
-      return this.request('book_check/' . $companyId, $appointments, self::METHOD_POST);
+    return this.request(`book_check/${companyId}`, appointments,  METHOD_POST);
   }
 
   /**
    * Создать запись на сеанс
    *
-   * @param integer $companyId
-   * @param array $person - Массив обязательных данных клиента со следующими полями:
+   * @param integer  companyId
+   * @param array  person - Массив обязательных данных клиента со следующими полями:
    *                        string phone - Телефон клиента вида 79161502239
    *                        string fullname
    *                        string email
-   * @param array $appointments - Массив записей со следующими полями:
+   * @param array  appointments - Массив записей со следующими полями:
    *                              integer id - Идентификатор записи для обратной связи
-   *                              array services - Массив идентификторов услуг
-   *                              array events - Массив идентификторов акций
+   *                               services - Массив идентификторов услуг
+   *                               events - Массив идентификторов акций
    *                              integer staff_id - Идентификатор специалиста
    *                              string datetime - Дата и время сеанса в формате ISO8601 (2015-09-29T13:00:00+04:00)
-   * @param string $code - Код подтверждения номера телефона
-   * @param array $notify - Массив используемых нотификацией со следующими ключами:
+   * @param string  code - Код подтверждения номера телефона
+   * @param array  notify - Массив используемых нотификацией со следующими ключами:
    *                        string notify_by_sms - За какое кол-во часов напоминанить по смс о записи (0 если не нужно)
    *                        string notify_by_email - За какое кол-во часов напоминанить по email о записи (0 если не нужно)
-   * @param string $comment - Комментарий к записи
-   * @param string $apiId - Внешний идентификатор записи
+   * @param string  comment - Комментарий к записи
+   * @param string  apiId - Внешний идентификатор записи
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/-/8/0
    * @throws YclientsException
    */
   postBookRecord(
-      $companyId,
-       $person,// array
-       $appointments, //array
-      $code = null,
-       $notify = null, // array
-      $comment = null,
-      $apiId = null
+    companyId,
+    person,// array
+    appointments, //array
+    code = null,
+    notify = null, // array
+    comment = null,
+    apiId = null
   ) {
-      $parameters = [];
+    parameters = [];
 
-      // проверим наличие обязательных параметров клиента
-      if (!isset($person['phone'], $person['fullname'], $person['email'])) {
-          throw new YclientsException('Клиент должен содержать все обязательные поля: phone, fullname, email.');
+    // проверим наличие обязательных параметров клиента
+    if (!isset(person['phone'], person['fullname'], person['email'])) {
+      throw new YclientsException('Клиент должен содержать все обязательные поля: phone, fullname, email.');
+    }
+
+    parameters = array_merge(parameters, person);
+
+    if (!count(appointments)) {
+      throw new YclientsException('Должна быть хотя бы одна запись.');
+    }
+
+    // проверим наличие обязательных параметров записей
+    foreach(appointments as appointment) {
+      if (!isset(appointment['id'], appointment['staff_id'], appointment['datetime'])) {
+        throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
       }
+    }
 
-      $parameters = array_merge($parameters, $person);
+    parameters['appointments'] = appointments;
 
-      if (!count($appointments)) {
-          throw new YclientsException('Должна быть хотя бы одна запись.');
+    if (notify) {
+      if (isset(notify['notify_by_sms'])) {
+        parameters['notify_by_sms'] = notify['notify_by_sms'];
       }
-
-      // проверим наличие обязательных параметров записей
-      foreach ($appointments as $appointment) {
-          if (!isset($appointment['id'], $appointment['staff_id'], $appointment['datetime'])) {
-              throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
-          }
+      if (isset(notify['notify_by_email'])) {
+        parameters['notify_by_email'] = notify['notify_by_email'];
       }
+    }
 
-      $parameters['appointments'] = $appointments;
+    if (code !== null) {
+      parameters['code'] = code;
+    }
 
-      if ($notify) {
-          if (isset($notify['notify_by_sms'])) {
-              $parameters['notify_by_sms'] = $notify['notify_by_sms'];
-          }
-          if (isset($notify['notify_by_email'])) {
-              $parameters['notify_by_email'] = $notify['notify_by_email'];
-          }
-      }
+    if (comment !== null) {
+      parameters['comment'] = comment;
+    }
 
-      if ($code !== null) {
-          $parameters['code'] = $code;
-      }
+    if (apiId !== null) {
+      parameters['api_id'] = apiId;
+    }
 
-      if ($comment !== null) {
-          $parameters['comment'] = $comment;
-      }
-
-      if ($apiId !== null) {
-          $parameters['api_id'] = $apiId;
-      }
-
-      return this.request('book_record/' . $companyId, $parameters, self::METHOD_POST);
+    return this.request(`book_record/${companyId}`, parameters,  METHOD_POST);
   }
 
   /**
    * Авторизоваться по номеру телефона и коду
    *
-   * @param string $phone - Телефон, на который будет отправлен код вида 79161005050
-   * @param string $code - Код подтверждения номера телефона, высланный по смс
+   * @param string  phone - Телефон, на который будет отправлен код вида 79161005050
+   * @param string  code - Код подтверждения номера телефона, высланный по смс
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/1/0/0
    * @throws YclientsException
    */
-   postUserAuth($phone, $code)
-  {
-      $parameters = [
-          'phone' => $phone,
-          'code' => $code,
-      ];
+  postUserAuth(phone, code) {
+    parameters = [
+      'phone' => phone,
+      'code' => code,
+    ];
 
-      return this.request('user/auth', $parameters, self::METHOD_POST);
+    return this.request('user/auth', parameters,  METHOD_POST);
   }
 
   /**
    * Получить записи пользователя
    *
-   * @param integer $recordId - ID записи, достаточно для удаления записи если пользователь
+   * @param integer  recordId - ID записи, достаточно для удаления записи если пользователь
    *                            авторизован, получить можно из ответа bookRecord()
-   * @param string $recordHash - HASH записи, обязательно для удаления записи если пользователь
+   * @param string  recordHash - HASH записи, обязательно для удаления записи если пользователь
    *                             не авторизован, получить можно из ответа bookRecord()
-   * @param string $userToken - токен для авторизации пользователя, обязательный, если $recordHash не указан
+   * @param string  userToken - токен для авторизации пользователя, обязательный, если  recordHash не указан
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/1/1/0
    * @throws YclientsException
    */
-   getUserRecords($recordId, $recordHash = null, $userToken = null)
-  {
-      if (!$recordHash && !$userToken) {
-          trigger_error('getUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
-      }
+  getUserRecords(recordId, recordHash = null, userToken = null) {
+    if (!recordHash && !userToken) {
+      trigger_error('getUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
+    }
 
-      return this.request('user/records/' . $recordId . '/' . $recordHash, [], self::METHOD_GET,
-          $userToken ?: true);
+    return this.request(`user/records/${recordId}/${recordHash}`, [],  METHOD_GET,
+      userToken ?: true);
   }
 
   /**
    * Удалить записи пользователя
    *
-   * @param integer $recordId - ID записи, достаточно для удаления записи если пользователь
+   * @param integer  recordId - ID записи, достаточно для удаления записи если пользователь
    *                            авторизован, получить можно из ответа bookRecord()
-   * @param string $recordHash - HASH записи, обязательно для удаления записи если пользователь
+   * @param string  recordHash - HASH записи, обязательно для удаления записи если пользователь
    *                             не авторизован, получить можно из ответа bookRecord()
-   * @param string $userToken - Токен для авторизации пользователя, обязательный, если $recordHash не указан
+   * @param string  userToken - Токен для авторизации пользователя, обязательный, если  recordHash не указан
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/1/1/1
    * @throws YclientsException
    */
-   deleteUserRecords($recordId, $recordHash = null, $userToken = null)
-  {
-      if (!$recordHash && !$userToken) {
-          trigger_error('deleteUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
-      }
+  deleteUserRecords(recordId, recordHash = null, userToken = null) {
+    if (!recordHash && !userToken) {
+      trigger_error('deleteUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
+    }
 
-      return this.request('user/records/' . $recordId . '/' . $recordHash, [], self::METHOD_DELETE,
-          $userToken ?: true);
+    return this.request(`user/records/${recordId}/${recordHash}`, [],  METHOD_DELETE,
+      userToken ?: true);
   }
 
   /**
    * Получить список компаний
    *
-   * @param integer $groupId - ID сети компаний
-   * @param bool $active - Если нужно получить только активные для онлайн-записи компании
-   * @param bool $moderated - Если нужно получить только прошедшие модерацию компании
-   * @param bool $forBooking - Если нужно получить поле next_slot по каждой компании
-   * @param bool $my - Если нужно компании, на управление которыми пользователь имеет права ($userToken тогда обязательно)
-   * @param string $userToken - Токен для авторизации пользователя, обязательный, если $my указан
+   * @param integer  groupId - ID сети компаний
+   * @param bool  active - Если нужно получить только активные для онлайн-записи компании
+   * @param bool  moderated - Если нужно получить только прошедшие модерацию компании
+   * @param bool  forBooking - Если нужно получить поле next_slot по каждой компании
+   * @param bool  my - Если нужно компании, на управление которыми пользователь имеет права ( userToken тогда обязательно)
+   * @param string  userToken - Токен для авторизации пользователя, обязательный, если  my указан
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/2/0/0
    * @throws YclientsException
    */
-   getCompanies(
-      $groupId = null,
-      $active = null,
-      $moderated = null,
-      $forBooking = null,
-      $my = null,
-      $userToken = null
+  getCompanies(
+    groupId = null,
+    active = null,
+    moderated = null,
+    forBooking = null,
+    my = null,
+    userToken = null
   ) {
-      if ($my && !$userToken) {
-          trigger_error('getCompanies() expected Argument 6 if set Argument 5', E_USER_WARNING);
-      }
+    if (my && !userToken) {
+      trigger_error('getCompanies() expected Argument 6 if set Argument 5', E_USER_WARNING);
+    }
 
-      $parameters = [];
+    parameters = [];
 
-      if ($groupId !== null) {
-          $parameters['group_id'] = $groupId;
-      }
+    if (groupId !== null) {
+      parameters['group_id'] = groupId;
+    }
 
-      if ($active !== null) {
-          $parameters['active'] = $active;
-      }
+    if (active !== null) {
+      parameters['active'] = active;
+    }
 
-      if ($moderated !== null) {
-          $parameters['moderated'] = $moderated;
-      }
+    if (moderated !== null) {
+      parameters['moderated'] = moderated;
+    }
 
-      if ($forBooking !== null) {
-          $parameters['forBooking'] = $forBooking;
-      }
+    if (forBooking !== null) {
+      parameters['forBooking'] = forBooking;
+    }
 
-      if ($my !== null) {
-          $parameters['my'] = $my;
-      }
+    if (my !== null) {
+      parameters['my'] = my;
+    }
 
-      return this.request('companies', $parameters, self::METHOD_GET, $userToken ?: true);
+    return this.request('companies', parameters,  METHOD_GET, userToken ?: true);
   }
 
   /**
    * Создать компанию
    *
-   * @param array $fields - Остальные необязательные поля для создания компании
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param array  fields - Остальные необязательные поля для создания компании
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/2/0/1
    * @throws YclientsException
    */
-   postCompany(array $fields, $userToken)
-  {
-      if (!isset($fields['title'])) {
-          throw new YclientsException('Для создании компании обязательно название компании.');
-      }
+  postCompany(  fields, userToken) {
+    if (!isset(fields['title'])) {
+      throw new YclientsException('Для создании компании обязательно название компании.');
+    }
 
-      return this.request('companies', $fields, self::METHOD_POST, $userToken);
+    return this.request('companies', fields,  METHOD_POST, userToken);
   }
 
   /**
    * Получить компанию
    *
-   * @param integer $id
+   * @param integer  id
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/2/1/0
    * @throws YclientsException
    */
-   getCompany($id)
-  {
-      return this.request('company/' . $id);
+  getCompany(id) {
+    return this.request(`company/${id}`);
   }
 
   /**
    * Изменить компанию
    *
-   * @param integer $id
-   * @param array $fields - Остальные необязательные поля для создания компании
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  id
+   * @param array  fields - Остальные необязательные поля для создания компании
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/2/1/1
    * @throws YclientsException
    */
-   putCompany($id, array $fields, $userToken)
-  {
-      return this.request('company/' . $id, $fields, self::METHOD_PUT, $userToken);
+  putCompany(id,   fields, userToken) {
+    return this.request(`company/${id}`, fields,  METHOD_PUT, userToken);
   }
 
   /**
    * Удалить компанию
    *
-   * @param integer $id
+   * @param integer  id
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/2/1/2
    * @throws YclientsException
    */
-   deleteCompany($id)
-  {
-      return this.request('company/' . $id, [], self::METHOD_DELETE);
+  deleteCompany(id) {
+    return this.request(`company/${id}`, [],  METHOD_DELETE);
   }
 
   /**
    * Получить список категорий услуг
    *
-   * @param integer $companyId - ID компании
-   * @param integer $categoryId - ID категории услуг
-   * @param integer $staffId - ID сотрудника (для получения категорий, привязанных к сотруднику)
+   * @param integer  companyId - ID компании
+   * @param integer  categoryId - ID категории услуг
+   * @param integer  staffId - ID сотрудника (для получения категорий, привязанных к сотруднику)
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/3/0/0
    * @throws YclientsException
    */
-   getServiceCategories($companyId, $categoryId, $staffId = null)
-  {
-      $parameters = [];
+  getServiceCategories(companyId, categoryId, staffId = null) {
+    parameters = [];
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      return this.request('service_categories/' . $companyId . '/' . $categoryId, $parameters);
+    return this.request(`service_categories/${companyId}/${categoryId}`, parameters);
   }
 
   /**
    * Создать категорию услуг
    *
-   * @param integer $companyId - ID компании
-   * @param integer $categoryId - ID категории услуг
-   * @param array $fields - Обязательные поля для категории со следующими полями:
+   * @param integer  companyId - ID компании
+   * @param integer  categoryId - ID категории услуг
+   * @param array  fields - Обязательные поля для категории со следующими полями:
    *                        string title - Название категории
    *                        integer api_id - Внешний идентификатор записи
    *                        integer weight
-   *                        array staff
-   * @param string $userToken - Токен для авторизации пользователя
+   *                         staff
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/3/0/1
    * @throws YclientsException
    */
-   postServiceCategories($companyId, $categoryId, $fields, $userToken)
-  {
-      return this.request('service_categories/' . $companyId . '/' . $categoryId, $fields, self::METHOD_POST,
-          $userToken);
+  postServiceCategories(companyId, categoryId, fields, userToken) {
+    return this.request(`service_categories/${companyId}/${categoryId}`, fields,  METHOD_POST,
+      userToken);
   }
 
   /**
    * Получить категорию услуг
    *
-   * @param integer $companyId - ID компании
-   * @param integer $categoryId - ID категории услуг
+   * @param integer  companyId - ID компании
+   * @param integer  categoryId - ID категории услуг
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/3/1/0
    * @throws YclientsException
    */
-   getServiceCategory($companyId, $categoryId)
-  {
-      return this.request('service_category/' . $companyId . '/' . $categoryId);
+  getServiceCategory(companyId, categoryId) {
+    return this.request(`service_category/${companyId}/${categoryId}`);
   }
 
   /**
    * Изменить категорию услуг
    *
-   * @param integer $companyId - ID компании
-   * @param integer $categoryId - ID категории услуг
-   * @param array $fields - Обязательные поля для категории со следующими полями:
+   * @param integer  companyId - ID компании
+   * @param integer  categoryId - ID категории услуг
+   * @param array  fields - Обязательные поля для категории со следующими полями:
    *                        string title - Название категории
    *                        integer weight
-   *                        array staff
-   * @param string $userToken - Токен для авторизации пользователя
+   *                         staff
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/3/1/1
    * @throws YclientsException
    */
-   putServiceCategory($companyId, $categoryId, $fields, $userToken)
-  {
-      return this.request('service_category/' . $companyId . '/' . $categoryId, $fields, self::METHOD_PUT,
-          $userToken);
+  putServiceCategory(companyId, categoryId, fields, userToken) {
+    return this.request(`service_category/${companyId}/${categoryId}`, fields,  METHOD_PUT,
+      userToken);
   }
 
   /**
    * Удалить категорию услуг
    *
-   * @param integer $companyId - ID компании
-   * @param integer $categoryId - ID категории услуг
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  categoryId - ID категории услуг
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/3/1/2
    * @throws YclientsException
    */
-   deleteServiceCategory($companyId, $categoryId, $userToken)
-  {
-      return this.request('service_category/' . $companyId . '/' . $categoryId, [], self::METHOD_DELETE,
-          $userToken);
+  deleteServiceCategory(companyId, categoryId, userToken) {
+    return this.request(`service_category/${companyId}/${categoryId}`, [],  METHOD_DELETE,
+      userToken);
   }
 
   /**
    * Получить список услуг / конкретную услугу
    *
-   * @param integer $companyId - ID компании
-   * @param integer $serviceId - ID услуги, если нужно работать с конкретной услугой
-   * @param integer $staffId - ID сотрудника, если нужно отфильтровать по сотруднику
-   * @param integer $categoryId - ID категории, если нужно отфильтровать по категории
+   * @param integer  companyId - ID компании
+   * @param integer  serviceId - ID услуги, если нужно работать с конкретной услугой
+   * @param integer  staffId - ID сотрудника, если нужно отфильтровать по сотруднику
+   * @param integer  categoryId - ID категории, если нужно отфильтровать по категории
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/4/0//
    * @throws YclientsException
    */
-   getServices($companyId, $serviceId = null, $staffId = null, $categoryId = null)
-  {
-      $parameters = [];
+  getServices(companyId, serviceId = null, staffId = null, categoryId = null) {
+    parameters = [];
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      if ($categoryId !== null) {
-          $parameters['category_id'] = $categoryId;
-      }
+    if (categoryId !== null) {
+      parameters['category_id'] = categoryId;
+    }
 
-      return this.request('services/' . $companyId . '/' . $serviceId, $parameters);
+    return this.request(`services/${companyId}/${serviceId}`, parameters);
   }
 
   /**
    * Создать услугу
    *
-   * @param integer $companyId - ID компании
-   * @param integer $serviceId - ID услуги
-   * @param string $title - Название услуги
-   * @param integer $categoryId - ID категории услуг
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields - Остальные необязательные поля для услуги
+   * @param integer  companyId - ID компании
+   * @param integer  serviceId - ID услуги
+   * @param string  title - Название услуги
+   * @param integer  categoryId - ID категории услуг
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields - Остальные необязательные поля для услуги
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/4/0/0
    * @throws YclientsException
    */
-   postServices($companyId, $serviceId, $categoryId, $title, $userToken, array $fields = null)
-  {
-      $parameters = [
-          'category_id' => $categoryId,
-          'title' => $title,
-      ];
+  postServices(companyId, serviceId, categoryId, title, userToken,   fields = null) {
+    parameters = [
+      'category_id' => categoryId,
+      'title' => title,
+    ];
 
-      $parameters = array_merge($parameters, $fields);
+    parameters = array_merge(parameters, fields);
 
-      return this.request('services/' . $companyId . '/' . $serviceId, $parameters, self::METHOD_POST, $userToken);
+    return this.request(`services/${companyId}/${serviceId}`, parameters,  METHOD_POST, userToken);
   }
 
   /**
    * Изменить услугу
    *
-   * @param integer $companyId - ID компании
-   * @param integer $serviceId - ID услуги
-   * @param string $title - Название услуги
-   * @param integer $categoryId - ID категории услуг
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields - Остальные необязательные поля для услуги
+   * @param integer  companyId - ID компании
+   * @param integer  serviceId - ID услуги
+   * @param string  title - Название услуги
+   * @param integer  categoryId - ID категории услуг
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields - Остальные необязательные поля для услуги
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/4/0/1
    * @throws YclientsException
    */
-   putServices($companyId, $serviceId, $categoryId, $title, $userToken, array $fields = null)
-  {
-      $parameters = [
-          'category_id' => $categoryId,
-          'title' => $title,
-      ];
+  putServices(companyId, serviceId, categoryId, title, userToken,   fields = null) {
+    parameters = [
+      'category_id' => categoryId,
+      'title' => title,
+    ];
 
-      $parameters = array_merge($parameters, $fields);
+    parameters = array_merge(parameters, fields);
 
-      return this.request('services/' . $companyId . '/' . $serviceId, $parameters, self::METHOD_PUT, $userToken);
+    return this.request(`services/${companyId}/${serviceId}`, parameters,  METHOD_PUT, userToken);
   }
 
   /**
    * Удалить услугу
    *
-   * @param integer $companyId - ID компании
-   * @param integer $serviceId - ID услуги
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  serviceId - ID услуги
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/4/0/2
    * @throws YclientsException
    */
-   deleteServices($companyId, $serviceId, $userToken)
-  {
-      return this.request('services/' . $companyId . '/' . $serviceId, [], self::METHOD_DELETE, $userToken);
+  deleteServices(companyId, serviceId, userToken) {
+    return this.request(`services/${companyId}/${serviceId}`, [],  METHOD_DELETE, userToken);
   }
 
   /**
    * Получить список акций / конкретную акцию
    *
-   * @param integer $companyId - ID компании
-   * @param integer $eventId - ID услуги, если нужно работать с конкретной услугой.
+   * @param integer  companyId - ID компании
+   * @param integer  eventId - ID услуги, если нужно работать с конкретной услугой.
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/5//
    * @throws YclientsException
    */
-   getEvents($companyId, $eventId = null)
-  {
-      return this.request('events/' . $companyId . '/' . $eventId);
+  getEvents(companyId, eventId = null) {
+    return this.request(`events/${companyId}/${eventId}`);
   }
 
   /**
    * Получить список сотрудников / конкретного сотрудника
    *
-   * @param integer $companyId - ID компании
-   * @param integer $staffId - ID сотрудника, если нужно работать с конкретным сотрудником
+   * @param integer  companyId - ID компании
+   * @param integer  staffId - ID сотрудника, если нужно работать с конкретным сотрудником
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/6//
    * @throws YclientsException
    */
-   getStaff($companyId, $staffId = null)
-  {
-      return this.request('staff/' . $companyId . '/' . $staffId);
+  getStaff(companyId, staffId = null) {
+    return this.request(`staff/${companyId}/${staffId}`);
   }
 
   /**
    * Добавить нового сотрудника
    *
-   * @param integer $companyId - ID компании
-   * @param integer $staffId - ID сотрудника
-   * @param string $name - Имя сотрудника
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields - Остальные необязательные поля для сотрудника
+   * @param integer  companyId - ID компании
+   * @param integer  staffId - ID сотрудника
+   * @param string  name - Имя сотрудника
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields - Остальные необязательные поля для сотрудника
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/6/0/0
    * @throws YclientsException
    */
-   postStaff($companyId, $staffId, $name, $userToken, array $fields = null)
-  {
-      $parameters = [
-          'name' => $name,
-      ];
+  postStaff(companyId, staffId, name, userToken, fields = null) {
+    parameters = [
+      'name' => name,
+    ];
 
-      $parameters = array_merge($parameters, $fields);
+    parameters = array_merge(parameters, fields);
 
-      return this.request('staff/' . $companyId . '/' . $staffId, $parameters, self::METHOD_POST, $userToken);
+    return this.request(`staff/${companyId}/${staffId}`, parameters,  METHOD_POST, userToken);
   }
 
   /**
    * Изменить сотрудника
    *
-   * @param integer $companyId - ID компании
-   * @param integer $staffId - ID сотрудника
-   * @param array $fields - Остальные необязательные поля для услуги
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  staffId - ID сотрудника
+   * @param array  fields - Остальные необязательные поля для услуги
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/6/0/1
    * @throws YclientsException
    */
-   putStaff($companyId, $staffId, array $fields, $userToken)
-  {
-      return this.request('staff/' . $companyId . '/' . $staffId, $fields, self::METHOD_PUT, $userToken);
+  putStaff(companyId, staffId,   fields, userToken) {
+    return this.request(`staff/${companyId}/${staffId}`, fields,  METHOD_PUT, userToken);
   }
 
   /**
    * Удалить сотрудника
    *
-   * @param integer $companyId - ID компании
-   * @param integer $staffId - ID сотрудника
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  staffId - ID сотрудника
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/6/0/2
    * @throws YclientsException
    */
-   deleteStaff($companyId, $staffId, $userToken)
-  {
-      return this.request('staff/' . $companyId . '/' . $staffId, [], self::METHOD_DELETE, $userToken);
+  deleteStaff(companyId, staffId, userToken) {
+    return this.request(`staff/${companyId}/${staffId}`, [],  METHOD_DELETE, userToken);
   }
 
   /**
    * Получить список клиентов
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param string $fullname
-   * @param string $phone
-   * @param string $email
-   * @param string $page
-   * @param string $count
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param string  fullname
+   * @param string  phone
+   * @param string  email
+   * @param string  page
+   * @param string  count
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/7/0/0
    * @throws YclientsException
    */
-   getClients(
-      $companyId,
-      $userToken,
-      $fullname = null,
-      $phone = null,
-      $email = null,
-      $page = null,
-      $count = null
+  getClients(
+    companyId,
+    userToken,
+    fullname = null,
+    phone = null,
+    email = null,
+    page = null,
+    count = null
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($fullname !== null) {
-          $parameters['fullname'] = $fullname;
-      }
+    if (fullname !== null) {
+      parameters['fullname'] = fullname;
+    }
 
-      if ($phone !== null) {
-          $parameters['phone'] = $phone;
-      }
+    if (phone !== null) {
+      parameters['phone'] = phone;
+    }
 
-      if ($email !== null) {
-          $parameters['email'] = $email;
-      }
+    if (email !== null) {
+      parameters['email'] = email;
+    }
 
-      if ($page !== null) {
-          $parameters['page'] = $page;
-      }
+    if (page !== null) {
+      parameters['page'] = page;
+    }
 
-      if ($count !== null) {
-          $parameters['count'] = $count;
-      }
+    if (count !== null) {
+      parameters['count'] = count;
+    }
 
-      return this.request('clients/' . $companyId, $parameters, self::METHOD_GET, $userToken);
+    return this.request(`clients/${companyId}`, parameters,  METHOD_GET, userToken);
   }
 
   /**
    * Добавить клиента
    *
-   * @param integer $companyId - ID компании
-   * @param string $name - Имя клиента
-   * @param integer $phone - Телефон клиента
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields - Остальные необязательные поля для клиента
+   * @param integer  companyId - ID компании
+   * @param string  name - Имя клиента
+   * @param integer  phone - Телефон клиента
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields - Остальные необязательные поля для клиента
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/7/0/1
    * @throws YclientsException
    */
-   postClients($companyId, $name, $phone, $userToken, array $fields = null)
-  {
-      $parameters = [
-          'name' => $name,
-          'phone' => $phone,
-      ];
+  postClients(companyId, name, phone, userToken,   fields = null) {
+    parameters = [
+      'name' => name,
+      'phone' => phone,
+    ];
 
-      $parameters = array_merge($parameters, $fields);
+    parameters = array_merge(parameters, fields);
 
-      return this.request('clients/' . $companyId, $parameters, self::METHOD_POST, $userToken);
+    return this.request(`clients/${companyId}`, parameters,  METHOD_POST, userToken);
   }
 
   /**
    * Получить клиента
    *
-   * @param integer $companyId - ID компании
-   * @param integer $id - ID клиента
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  id - ID клиента
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/7/1/0
    * @throws YclientsException
    */
-   getClient($companyId, $id, $userToken)
-  {
-      return this.request('client/' . $companyId . '/' . $id, [], self::METHOD_GET, $userToken);
+  getClient(companyId, id, userToken) {
+    return this.request(`client/${companyId}/${id}`, [],  METHOD_GET, userToken);
   }
 
   /**
    * Редактировать клиента
    *
-   * @param integer $companyId - ID компании
-   * @param integer $id - ID клиента
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields
+   * @param integer  companyId - ID компании
+   * @param integer  id - ID клиента
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/7/1/1
    * @throws YclientsException
    */
-   putClient($companyId, $id, $userToken, array $fields)
-  {
-      return this.request('client/' . $companyId . '/' . $id, $fields, self::METHOD_PUT, $userToken);
+  putClient(companyId, id, userToken,   fields) {
+    return this.request(`client/${companyId}/${id}`, fields,  METHOD_PUT, userToken);
   }
 
   /**
    * Удалить клиента
    *
-   * @param integer $companyId - ID компании
-   * @param integer $id - ID клиента
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  id - ID клиента
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/7/1/2
    * @throws YclientsException
    */
-   deleteClient($companyId, $id, $userToken)
-  {
-      return this.request('client/' . $companyId . '/' . $id, [], self::METHOD_DELETE, $userToken);
+  deleteClient(companyId, id, userToken) {
+    return this.request(`client/${companyId}/${id}`, [],  METHOD_DELETE, userToken);
   }
 
   /**
    * Получить список записей
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param integer $page
-   * @param integer $count
-   * @param integer $staffId
-   * @param integer $clientId
-   * @param \DateTime $startDate
-   * @param \DateTime $endDate
-   * @param \DateTime $cStartDate
-   * @param \DateTime $cEndDate
-   * @param \DateTime $changedAfter
-   * @param \DateTime $changedBefore
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param integer  page
+   * @param integer  count
+   * @param integer  staffId
+   * @param integer  clientId
+   * @param   startDate
+   * @param   endDate
+   * @param   cStartDate
+   * @param   cEndDate
+   * @param   changedAfter
+   * @param   changedBefore
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/8/0/0
    * @throws YclientsException
    */
-   getRecords(
-      $companyId,
-      $userToken,
-      $page = null,
-      $count = null,
-      $staffId = null,
-      $clientId = null,
-      \DateTime $startDate = null,
-      \DateTime $endDate = null,
-      \DateTime $cStartDate = null,
-      \DateTime $cEndDate = null,
-      \DateTime $changedAfter = null,
-      \DateTime $changedBefore = null
+  getRecords(
+    companyId,
+    userToken,
+    page = null,
+    count = null,
+    staffId = null,
+    clientId = null,
+      startDate = null,
+      endDate = null,
+      cStartDate = null,
+      cEndDate = null,
+      changedAfter = null,
+      changedBefore = null
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($page !== null) {
-          $parameters['page'] = $page;
-      }
+    if (page !== null) {
+      parameters['page'] = page;
+    }
 
-      if ($count !== null) {
-          $parameters['count'] = $count;
-      }
+    if (count !== null) {
+      parameters['count'] = count;
+    }
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      if ($clientId !== null) {
-          $parameters['client_id'] = $clientId;
-      }
+    if (clientId !== null) {
+      parameters['client_id'] = clientId;
+    }
 
-      if ($startDate !== null) {
-          $parameters['start_date'] = $startDate->format('Y-m-d');
-      }
+    if (startDate !== null) {
+      parameters['start_date'] = startDate -> format('Y-m-d');
+    }
 
-      if ($endDate !== null) {
-          $parameters['end_date'] = $endDate->format('Y-m-d');
-      }
+    if (endDate !== null) {
+      parameters['end_date'] = endDate -> format('Y-m-d');
+    }
 
-      if ($cStartDate !== null) {
-          $parameters['c_start_date'] = $cStartDate->format('Y-m-d');
-      }
+    if (cStartDate !== null) {
+      parameters['c_start_date'] = cStartDate -> format('Y-m-d');
+    }
 
-      if ($cEndDate !== null) {
-          $parameters['c_end_date'] = $cEndDate->format('Y-m-d');
-      }
+    if (cEndDate !== null) {
+      parameters['c_end_date'] = cEndDate -> format('Y-m-d');
+    }
 
-      if ($changedAfter !== null) {
-          $parameters['changed_after'] = $changedAfter->format(\DateTime::ISO8601);
-      }
+    if (changedAfter !== null) {
+      parameters['changed_after'] = changedAfter -> format(:: ISO8601);
+    }
 
-      if ($changedBefore !== null) {
-          $parameters['changed_before'] = $changedBefore->format(\DateTime::ISO8601);
-      }
+    if (changedBefore !== null) {
+      parameters['changed_before'] = changedBefore -> format(:: ISO8601);
+    }
 
-      return this.request('records/' . $companyId, $parameters, self::METHOD_GET, $userToken);
+    return this.request(`records/${companyId}`, parameters,  METHOD_GET, userToken);
   }
 
   /**
    * Создать новую запись
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param integer $staffId
-   * @param array $services
-   * @param array $client
-   * @param \DateTime $datetime
-   * @param integer $seanceLength
-   * @param bool $saveIfBusy
-   * @param bool $sendSms
-   * @param string $comment
-   * @param integer $smsRemainHours
-   * @param integer $emailRemainHours
-   * @param integer $apiId
-   * @param integer $attendance
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param integer  staffId
+   * @param array  services
+   * @param array  client
+   * @param   datetime
+   * @param integer  seanceLength
+   * @param bool  saveIfBusy
+   * @param bool  sendSms
+   * @param string  comment
+   * @param integer  smsRemainHours
+   * @param integer  emailRemainHours
+   * @param integer  apiId
+   * @param integer  attendance
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/8/0/1
    * @throws YclientsException
    */
-   postRecords(
-      $companyId,
-      $userToken,
-      $staffId,
-      $services,
-      $client,
-      \DateTime $datetime,
-      $seanceLength,
-      $saveIfBusy,
-      $sendSms,
-      $comment = null,
-      $smsRemainHours = null,
-      $emailRemainHours = null,
-      $apiId = null,
-      $attendance = null
+  postRecords(
+    companyId,
+    userToken,
+    staffId,
+    services,
+    client,
+      datetime,
+    seanceLength,
+    saveIfBusy,
+    sendSms,
+    comment = null,
+    smsRemainHours = null,
+    emailRemainHours = null,
+    apiId = null,
+    attendance = null
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      if ($services !== null) {
-          $parameters['services'] = $services;
-      }
+    if (services !== null) {
+      parameters['services'] = services;
+    }
 
-      if ($client !== null) {
-          $parameters['client'] = $client;
-      }
+    if (client !== null) {
+      parameters['client'] = client;
+    }
 
-      if ($datetime !== null) {
-          $parameters['datetime'] = $datetime->format(\DateTime::ISO8601);
-      }
+    if (datetime !== null) {
+      parameters['datetime'] = datetime -> format(:: ISO8601);
+    }
 
-      if ($seanceLength !== null) {
-          $parameters['seance_length'] = $seanceLength;
-      }
+    if (seanceLength !== null) {
+      parameters['seance_length'] = seanceLength;
+    }
 
-      if ($saveIfBusy !== null) {
-          $parameters['save_if_busy'] = $saveIfBusy;
-      }
+    if (saveIfBusy !== null) {
+      parameters['save_if_busy'] = saveIfBusy;
+    }
 
-      if ($sendSms !== null) {
-          $parameters['send_sms'] = $sendSms;
-      }
+    if (sendSms !== null) {
+      parameters['send_sms'] = sendSms;
+    }
 
-      if ($comment !== null) {
-          $parameters['comment'] = $comment;
-      }
+    if (comment !== null) {
+      parameters['comment'] = comment;
+    }
 
-      if ($smsRemainHours !== null) {
-          $parameters['sms_remain_hours'] = $smsRemainHours;
-      }
+    if (smsRemainHours !== null) {
+      parameters['sms_remain_hours'] = smsRemainHours;
+    }
 
-      if ($emailRemainHours !== null) {
-          $parameters['email_remain_hours'] = $emailRemainHours;
-      }
+    if (emailRemainHours !== null) {
+      parameters['email_remain_hours'] = emailRemainHours;
+    }
 
-      if ($apiId !== null) {
-          $parameters['api_id'] = $apiId;
-      }
+    if (apiId !== null) {
+      parameters['api_id'] = apiId;
+    }
 
-      if ($attendance !== null) {
-          $parameters['attendance'] = $attendance;
-      }
+    if (attendance !== null) {
+      parameters['attendance'] = attendance;
+    }
 
-      return this.request('records/' . $companyId, $parameters, self::METHOD_POST, $userToken);
+    return this.request(`records/${companyId}`, parameters,  METHOD_POST, userToken);
   }
 
   /**
    * Получить запись
    *
-   * @param integer $companyId - ID компании
-   * @param integer $recordId
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  recordId
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/8/1/0
    * @throws YclientsException
    */
-   getRecord($companyId, $recordId, $userToken)
-  {
-      return this.request('record/' . $companyId . '/' . $recordId, [], self::METHOD_GET, $userToken);
+  getRecord(companyId, recordId, userToken) {
+    return this.request(`record/${companyId}/${recordId}`, [],  METHOD_GET, userToken);
   }
 
   /**
    * Изменить запись
    *
-   * @param integer $companyId - ID компании
-   * @param integer $recordId
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields
+   * @param integer  companyId - ID компании
+   * @param integer  recordId
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/8/1/1
    * @throws YclientsException
    */
-  putRecord($companyId, $recordId, $userToken, array $fields)
-  {
-      return this.request('record/' . $companyId . '/' . $recordId, $fields, self::METHOD_PUT, $userToken);
+  putRecord(companyId, recordId, userToken,   fields) {
+    return this.request(`record/${companyId}/${recordId}`, fields,  METHOD_PUT, userToken);
   }
 
   /**
    * Удалить запись
    *
-   * @param integer $companyId - ID компании
-   * @param integer $recordId
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param integer  recordId
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/8/1/2
    * @throws YclientsException
    */
-  deleteRecord($companyId, $recordId, $userToken)
-  {
-      return this.request('record/' . $companyId . '/' . $recordId, [], self::METHOD_DELETE, $userToken);
+  deleteRecord(companyId, recordId, userToken) {
+    return this.request(`record/${companyId}/${recordId}`, [],  METHOD_DELETE, userToken);
   }
 
   /**
    * Изменить расписание работы сотрудника
    *
-   * @param integer $companyId - ID компании
-   * @param integer $staffId
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param array $fields
+   * @param integer  companyId - ID компании
+   * @param integer  staffId
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param array  fields
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/9/0
    * @throws YclientsException
    */
-  putSchedule($companyId, $staffId, $userToken, $fields)
-  {
-      return this.request('schedule/' . $companyId . '/' . $staffId, $fields, self::METHOD_PUT, $userToken);
+  putSchedule(companyId, staffId, userToken, fields) {
+    return this.request(`schedule/${companyId}/${staffId}`, fields,  METHOD_PUT, userToken);
   }
 
   /**
    * Получить список дат для журнала
    *
-   * @param integer $companyId - ID компании
-   * @param \DateTime $date
-   * @param integer $staffId
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param   date
+   * @param integer  staffId
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/10/0/0
    * @throws YclientsException
    */
-  getTimetableDates($companyId, \DateTime $date, $staffId, $userToken)
-  {
-      $parameters = [];
+  getTimetableDates(companyId,   date, staffId, userToken) {
+    parameters = [];
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      return this.request('timetable/dates/' . $companyId . '/' . $date->format('Y-m-d'), $parameters,
-          self::METHOD_GET, $userToken);
+    return this.request(`timetable/dates/${companyId}/${date -> format('Y-m-d')}`, parameters,
+       METHOD_GET, userToken);
   }
 
   /**
    * Получить список сеансов для журнала
    *
-   * @param integer $companyId - ID компании
-   * @param \DateTime $date
-   * @param integer $staffId
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param   date
+   * @param integer  staffId
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/11/0/0
    * @throws YclientsException
    */
-  getTimetableSeances($companyId, \DateTime $date, $staffId, $userToken)
-  {
-      return this.request('timetable/seances/' . $companyId . '/' . $staffId . '/' . $date->format('Y-m-d'), [],
-          self::METHOD_GET, $userToken);
+  getTimetableSeances(companyId,   date, staffId, userToken) {
+    return this.request(`timetable/seances/${companyId}/${staffId}/${date -> format('Y-m-d')}`, [],
+       METHOD_GET, userToken);
   }
 
   /**
    * Получить комментарии
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param \DateTime $startDate
-   * @param \DateTime $endDate
-   * @param integer $staffId
-   * @param integer $rating
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param   startDate
+   * @param   endDate
+   * @param integer  staffId
+   * @param integer  rating
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/12/0/0
    * @throws YclientsException
    */
   getComments(
-      $companyId,
-      $userToken,
-      $startDate = null, // \DateTime 
-      $endDate = null, // \DateTime 
-      $staffId = null,
-      $rating = null
+    companyId,
+    userToken,
+    startDate = null, //  
+    endDate = null, //  
+    staffId = null,
+    rating = null
   ) {
-      $parameters = [];
+    parameters = [];
 
-      if ($startDate !== null) {
-          $parameters['start_date'] = $startDate->format('Y-m-d');
-      }
+    if (startDate !== null) {
+      parameters['start_date'] = startDate -> format('Y-m-d');
+    }
 
-      if ($endDate !== null) {
-          $parameters['end_date'] = $endDate->format('Y-m-d');
-      }
+    if (endDate !== null) {
+      parameters['end_date'] = endDate -> format('Y-m-d');
+    }
 
-      if ($staffId !== null) {
-          $parameters['staff_id'] = $staffId;
-      }
+    if (staffId !== null) {
+      parameters['staff_id'] = staffId;
+    }
 
-      if ($rating !== null) {
-          $parameters['rating'] = $rating;
-      }
+    if (rating !== null) {
+      parameters['rating'] = rating;
+    }
 
-      return this.request('comments/' . $companyId, $parameters, self::METHOD_GET, $userToken);
+    return this.request(`comments/${companyId}`, parameters,  METHOD_GET, userToken);
   }
 
   /**
    * Получить пользователей компании
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/13/0/0
    * @throws YclientsException
    */
-  getCompanyUsers($companyId, $userToken)
-  {
-      return this.request('company_users/' . $companyId, [], self::METHOD_GET, $userToken);
+  getCompanyUsers(companyId, userToken) {
+    return this.request(`company_users/${companyId}`, [],  METHOD_GET, userToken);
   }
 
   /**
    * Получить кассы компании
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/14/0/0
    * @throws YclientsException
    */
-  getAccounts($companyId, $userToken)
-  {
-      return this.request('accounts/' . $companyId, [], self::METHOD_GET, $userToken);
+  getAccounts(companyId, userToken) {
+    return this.request(`accounts/${companyId}`, [],  METHOD_GET, userToken);
   }
 
   /**
    * Отправить SMS
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
-   * @param integer[] $clientIds - ID клиентов
-   * @param string $text - Тест сообщения
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
+   * @param integer[]  clientIds - ID клиентов
+   * @param string  text - Тест сообщения
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/14/0/0
    * @throws YclientsException
    */
-  sendSMS($companyId, $userToken, $clientIds, $text)
-  {
-      $parameters = [];
-      $parameters['client_ids'] = $clientIds;
-      $parameters['text'] = $text;
+  sendSMS(companyId, userToken, clientIds, text) {
+    parameters = [];
+    parameters['client_ids'] = clientIds;
+    parameters['text'] = text;
 
-      return this.request('sms/clients/by_id/' . $companyId, $parameters, self::METHOD_POST, $userToken);
+    return this.request(`sms/clients/by_id/${companyId}`, parameters,  METHOD_POST, userToken);
   }
 
   /**
    * Получить склады компании
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/15/0/0
    * @throws YclientsException
    */
-  getStorages($companyId, $userToken)
-  {
-      return this.request('storages/' . $companyId, [], self::METHOD_GET, $userToken);
+  getStorages(companyId, userToken) {
+    return this.request(`storages/${companyId}`, [],  METHOD_GET, userToken);
   }
 
   /**
    * Получить настройки уведомлений о событиях
    *
-   * @param integer $companyId - ID компании
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/18/0/0
    * @throws YclientsException
    */
-  getHooks($companyId, $userToken)
-  {
-      return this.request('hooks_settings/' . $companyId, [], self::METHOD_GET, $userToken);
+  getHooks(companyId, userToken) {
+    return this.request(`hooks_settings/${companyId}`, [],  METHOD_GET, userToken);
   }
 
   /**
    * Изменить настройки уведомлений о событиях
    *
-   * @param integer $companyId - ID компании
-   * @param array $fields
-   * @param string $userToken - Токен для авторизации пользователя
+   * @param integer  companyId - ID компании
+   * @param array  fields
+   * @param string  userToken - Токен для авторизации пользователя
    * @return array
    * @access public
    * @see http://docs.yclients.apiary.io/#reference/18/0/1
    * @throws YclientsException
    */
-  postHooks($companyId, $fields, $userToken)
-  {
-      if (!isset($fields['url'])) {
-          throw new YclientsException('Не передан обязательный параметр url');
-      }
-      if (!isset($fields['active'])) {
-          throw new YclientsException('Не передан обязательный параметр active');
-      }
-      return this.request('hooks_settings/' . $companyId, $fields, self::METHOD_POST, $userToken);
+  postHooks(companyId, fields, userToken) {
+    if (!isset(fields['url'])) {
+      throw new YclientsException('Не передан обязательный параметр url');
+    }
+    if (!isset(fields['active'])) {
+      throw new YclientsException('Не передан обязательный параметр active');
+    }
+    return this.request(`hooks_settings/${companyId}`, fields,  METHOD_POST, userToken);
   }
 }
 
@@ -1458,15 +1419,15 @@ const api = new YclientsApi({
 })
 
 api
-.getAuth({"login": "amatveevdev9@gmail.com", "password": "txxta6"})
-.then(data => console.log(data))
-.catch((error) => {
-  console.log(error.stack)
-});
+  .getAuth({ "login": "amatveevdev9@gmail.com", "password": "txxta6" })
+  .then(data => console.log(data))
+  .catch((error) => {
+    console.log(error.stack)
+  });
 
 
 api.getBookform('466816')
-.then(data => console.log(data))
-.catch((error) => {
-  console.log(error.stack)
-});
+  .then(data => console.log(data))
+  .catch((error) => {
+    console.log(error.stack)
+  });
