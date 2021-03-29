@@ -215,7 +215,7 @@ class YclientsApi {
     }
 
     if (datetime !== null) {
-      parameters['datetime'] = datetime -> format(:: ISO8601);
+      parameters['datetime'] = new Date(datetime) // datetime -> format(:: ISO8601);
     }
 
     if (serviceIds !== null) {
@@ -312,7 +312,10 @@ class YclientsApi {
       parameters['event_ids'] = eventIds;
     }
 
-    return this.request(`book_times/${companyId}/${staffId}/${date -> format('Y-m-d')}`, parameters);
+
+
+    // format(new Date(date), 'yyyy-MM-dd')
+    return this.request(`book_times/${companyId}/${staffId}/${format(new Date(date), 'yyyy-MM-dd')}`, parameters);
   }
 
   /**
@@ -327,15 +330,15 @@ class YclientsApi {
    * @throws YclientsException
    */
   postBookCode(companyId, phone, fullname = null) {
-    parameters = [
-      'phone' => phone
-    ];
+    parameters = {
+      phone
+    };
 
     if (fullname !== null) {
       parameters['fullname'] = fullname;
     }
 
-    return this.request(`book_code/${companyId}`, parameters,  METHOD_POST);
+    return this.request(`book_code/${companyId}`, parameters, METHOD_POST);
   }
 
   /**
@@ -355,13 +358,13 @@ class YclientsApi {
    */
   postBookCheck(companyId, appointments) {
     // проверим наличие обязательных параметров
-    foreach(appointments as appointment) {
+    appointments.map(appointment => {
       if (!isset(appointment['id'], appointment['staff_id'], appointment['datetime'])) {
         throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
       }
-    }
+    })
 
-    return this.request(`book_check/${companyId}`, appointments,  METHOD_POST);
+    return this.request(`book_check/${companyId}`, appointments, METHOD_POST);
   }
 
   /**
@@ -412,11 +415,12 @@ class YclientsApi {
     }
 
     // проверим наличие обязательных параметров записей
-    foreach(appointments as appointment) {
+
+    appointments.map(appointment => {
       if (!isset(appointment['id'], appointment['staff_id'], appointment['datetime'])) {
         throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
       }
-    }
+    })
 
     parameters['appointments'] = appointments;
 
@@ -441,7 +445,7 @@ class YclientsApi {
       parameters['api_id'] = apiId;
     }
 
-    return this.request(`book_record/${companyId}`, parameters,  METHOD_POST);
+    return this.request(`book_record/${companyId}`, parameters, METHOD_POST);
   }
 
   /**
@@ -455,12 +459,12 @@ class YclientsApi {
    * @throws YclientsException
    */
   postUserAuth(phone, code) {
-    parameters = [
-      'phone' => phone,
-      'code' => code,
-    ];
+    parameters = {
+      phone,
+      code,
+    };
 
-    return this.request('user/auth', parameters,  METHOD_POST);
+    return this.request('user/auth', parameters, METHOD_POST);
   }
 
   /**
@@ -481,8 +485,7 @@ class YclientsApi {
       trigger_error('getUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
     }
 
-    return this.request(`user/records/${recordId}/${recordHash}`, [],  METHOD_GET,
-      userToken ?: true);
+    return this.request(`user/records/${recordId}/${recordHash}`, [], METHOD_GET, true);
   }
 
   /**
@@ -503,8 +506,8 @@ class YclientsApi {
       trigger_error('deleteUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
     }
 
-    return this.request(`user/records/${recordId}/${recordHash}`, [],  METHOD_DELETE,
-      userToken ?: true);
+    return this.request(`user/records/${recordId}/${recordHash}`, [], METHOD_DELETE)
+      // userToken ?: true);
   }
 
   /**
@@ -555,7 +558,7 @@ class YclientsApi {
       parameters['my'] = my;
     }
 
-    return this.request('companies', parameters,  METHOD_GET, userToken ?: true);
+    return this.request('companies', parameters, METHOD_GET) // , userToken ?: true);
   }
 
   /**
@@ -568,12 +571,12 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/2/0/1
    * @throws YclientsException
    */
-  postCompany(  fields, userToken) {
+  postCompany(fields, userToken) {
     if (!isset(fields['title'])) {
       throw new YclientsException('Для создании компании обязательно название компании.');
     }
 
-    return this.request('companies', fields,  METHOD_POST, userToken);
+    return this.request('companies', fields, METHOD_POST, userToken);
   }
 
   /**
@@ -600,8 +603,8 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/2/1/1
    * @throws YclientsException
    */
-  putCompany(id,   fields, userToken) {
-    return this.request(`company/${id}`, fields,  METHOD_PUT, userToken);
+  putCompany(id, fields, userToken) {
+    return this.request(`company/${id}`, fields, METHOD_PUT, userToken);
   }
 
   /**
@@ -614,7 +617,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   deleteCompany(id) {
-    return this.request(`company/${id}`, [],  METHOD_DELETE);
+    return this.request(`company/${id}`, [], METHOD_DELETE);
   }
 
   /**
@@ -655,7 +658,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   postServiceCategories(companyId, categoryId, fields, userToken) {
-    return this.request(`service_categories/${companyId}/${categoryId}`, fields,  METHOD_POST,
+    return this.request(`service_categories/${companyId}/${categoryId}`, fields, METHOD_POST,
       userToken);
   }
 
@@ -689,7 +692,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   putServiceCategory(companyId, categoryId, fields, userToken) {
-    return this.request(`service_category/${companyId}/${categoryId}`, fields,  METHOD_PUT,
+    return this.request(`service_category/${companyId}/${categoryId}`, fields, METHOD_PUT,
       userToken);
   }
 
@@ -705,7 +708,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   deleteServiceCategory(companyId, categoryId, userToken) {
-    return this.request(`service_category/${companyId}/${categoryId}`, [],  METHOD_DELETE,
+    return this.request(`service_category/${companyId}/${categoryId}`, [], METHOD_DELETE,
       userToken);
   }
 
@@ -749,15 +752,15 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/4/0/0
    * @throws YclientsException
    */
-  postServices(companyId, serviceId, categoryId, title, userToken,   fields = null) {
-    parameters = [
-      'category_id' => categoryId,
-      'title' => title,
-    ];
+  postServices(companyId, serviceId, categoryId, title, userToken, fields = null) {
+    parameters = {
+      'category_id': categoryId,
+      'title': title,
+    };
 
-    parameters = array_merge(parameters, fields);
+    parameters = Object.assign(parameters, fields);
 
-    return this.request(`services/${companyId}/${serviceId}`, parameters,  METHOD_POST, userToken);
+    return this.request(`services/${companyId}/${serviceId}`, parameters, METHOD_POST, userToken);
   }
 
   /**
@@ -774,15 +777,15 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/4/0/1
    * @throws YclientsException
    */
-  putServices(companyId, serviceId, categoryId, title, userToken,   fields = null) {
-    parameters = [
-      'category_id' => categoryId,
-      'title' => title,
-    ];
+  putServices(companyId, serviceId, categoryId, title, userToken, fields = null) {
+    parameters = {
+      'category_id': categoryId,
+      'title': title,
+    };
 
-    parameters = array_merge(parameters, fields);
+    parameters = Object.assign(parameters, fields);
 
-    return this.request(`services/${companyId}/${serviceId}`, parameters,  METHOD_PUT, userToken);
+    return this.request(`services/${companyId}/${serviceId}`, parameters, METHOD_PUT, userToken);
   }
 
   /**
@@ -797,7 +800,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   deleteServices(companyId, serviceId, userToken) {
-    return this.request(`services/${companyId}/${serviceId}`, [],  METHOD_DELETE, userToken);
+    return this.request(`services/${companyId}/${serviceId}`, [], METHOD_DELETE, userToken);
   }
 
   /**
@@ -842,13 +845,13 @@ class YclientsApi {
    * @throws YclientsException
    */
   postStaff(companyId, staffId, name, userToken, fields = null) {
-    parameters = [
-      'name' => name,
-    ];
+    parameters = {
+      name,
+    };
 
-    parameters = array_merge(parameters, fields);
+    parameters = Object.assign(parameters, fields);
 
-    return this.request(`staff/${companyId}/${staffId}`, parameters,  METHOD_POST, userToken);
+    return this.request(`staff/${companyId}/${staffId}`, parameters, METHOD_POST, userToken);
   }
 
   /**
@@ -863,8 +866,8 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/6/0/1
    * @throws YclientsException
    */
-  putStaff(companyId, staffId,   fields, userToken) {
-    return this.request(`staff/${companyId}/${staffId}`, fields,  METHOD_PUT, userToken);
+  putStaff(companyId, staffId, fields, userToken) {
+    return this.request(`staff/${companyId}/${staffId}`, fields, METHOD_PUT, userToken);
   }
 
   /**
@@ -879,7 +882,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   deleteStaff(companyId, staffId, userToken) {
-    return this.request(`staff/${companyId}/${staffId}`, [],  METHOD_DELETE, userToken);
+    return this.request(`staff/${companyId}/${staffId}`, [], METHOD_DELETE, userToken);
   }
 
   /**
@@ -928,7 +931,7 @@ class YclientsApi {
       parameters['count'] = count;
     }
 
-    return this.request(`clients/${companyId}`, parameters,  METHOD_GET, userToken);
+    return this.request(`clients/${companyId}`, parameters, METHOD_GET, userToken);
   }
 
   /**
@@ -944,15 +947,15 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/7/0/1
    * @throws YclientsException
    */
-  postClients(companyId, name, phone, userToken,   fields = null) {
+  postClients(companyId, name, phone, userToken, fields = null) {
     parameters = [
-      'name' => name,
-      'phone' => phone,
+      name,
+      phone,
     ];
 
-    parameters = array_merge(parameters, fields);
+    parameters = Object.assign(parameters, fields);
 
-    return this.request(`clients/${companyId}`, parameters,  METHOD_POST, userToken);
+    return this.request(`clients/${companyId}`, parameters, METHOD_POST, userToken);
   }
 
   /**
@@ -967,7 +970,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   getClient(companyId, id, userToken) {
-    return this.request(`client/${companyId}/${id}`, [],  METHOD_GET, userToken);
+    return this.request(`client/${companyId}/${id}`, [], METHOD_GET, userToken);
   }
 
   /**
@@ -982,8 +985,8 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/7/1/1
    * @throws YclientsException
    */
-  putClient(companyId, id, userToken,   fields) {
-    return this.request(`client/${companyId}/${id}`, fields,  METHOD_PUT, userToken);
+  putClient(companyId, id, userToken, fields) {
+    return this.request(`client/${companyId}/${id}`, fields, METHOD_PUT, userToken);
   }
 
   /**
@@ -998,7 +1001,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   deleteClient(companyId, id, userToken) {
-    return this.request(`client/${companyId}/${id}`, [],  METHOD_DELETE, userToken);
+    return this.request(`client/${companyId}/${id}`, [], METHOD_DELETE, userToken);
   }
 
   /**
@@ -1028,12 +1031,12 @@ class YclientsApi {
     count = null,
     staffId = null,
     clientId = null,
-      startDate = null,
-      endDate = null,
-      cStartDate = null,
-      cEndDate = null,
-      changedAfter = null,
-      changedBefore = null
+    startDate = null,
+    endDate = null,
+    cStartDate = null,
+    cEndDate = null,
+    changedAfter = null,
+    changedBefore = null
   ) {
     parameters = [];
 
@@ -1054,30 +1057,30 @@ class YclientsApi {
     }
 
     if (startDate !== null) {
-      parameters['start_date'] = startDate -> format('Y-m-d');
+      parameters['start_date'] = format(new Date(startDate), 'yyyy-MM-dd');
     }
 
     if (endDate !== null) {
-      parameters['end_date'] = endDate -> format('Y-m-d');
+      parameters['end_date'] = format(new Date(endDate), 'yyyy-MM-dd');
     }
 
     if (cStartDate !== null) {
-      parameters['c_start_date'] = cStartDate -> format('Y-m-d');
+      parameters['c_start_date'] = format(new Date(cStartDate), 'yyyy-MM-dd');
     }
 
     if (cEndDate !== null) {
-      parameters['c_end_date'] = cEndDate -> format('Y-m-d');
+      parameters['c_end_date'] = format(new Date(cEndDate), 'yyyy-MM-dd');
     }
 
     if (changedAfter !== null) {
-      parameters['changed_after'] = changedAfter -> format(:: ISO8601);
+      parameters['changed_after'] = new Date(changedAfter) // changedAfter -> format(:: ISO8601);
     }
 
     if (changedBefore !== null) {
-      parameters['changed_before'] = changedBefore -> format(:: ISO8601);
+      parameters['changed_before'] = new Date(changedBefore)  // -> format(:: ISO8601);
     }
 
-    return this.request(`records/${companyId}`, parameters,  METHOD_GET, userToken);
+    return this.request(`records/${companyId}`, parameters, METHOD_GET, userToken);
   }
 
   /**
@@ -1108,7 +1111,7 @@ class YclientsApi {
     staffId,
     services,
     client,
-      datetime,
+    datetime,
     seanceLength,
     saveIfBusy,
     sendSms,
@@ -1133,7 +1136,7 @@ class YclientsApi {
     }
 
     if (datetime !== null) {
-      parameters['datetime'] = datetime -> format(:: ISO8601);
+      parameters['datetime'] = new Date(datetime)  // datetime -> format(:: ISO8601);
     }
 
     if (seanceLength !== null) {
@@ -1168,7 +1171,7 @@ class YclientsApi {
       parameters['attendance'] = attendance;
     }
 
-    return this.request(`records/${companyId}`, parameters,  METHOD_POST, userToken);
+    return this.request(`records/${companyId}`, parameters, METHOD_POST, userToken);
   }
 
   /**
@@ -1183,7 +1186,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   getRecord(companyId, recordId, userToken) {
-    return this.request(`record/${companyId}/${recordId}`, [],  METHOD_GET, userToken);
+    return this.request(`record/${companyId}/${recordId}`, [], METHOD_GET, userToken);
   }
 
   /**
@@ -1198,8 +1201,8 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/8/1/1
    * @throws YclientsException
    */
-  putRecord(companyId, recordId, userToken,   fields) {
-    return this.request(`record/${companyId}/${recordId}`, fields,  METHOD_PUT, userToken);
+  putRecord(companyId, recordId, userToken, fields) {
+    return this.request(`record/${companyId}/${recordId}`, fields, METHOD_PUT, userToken);
   }
 
   /**
@@ -1214,7 +1217,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   deleteRecord(companyId, recordId, userToken) {
-    return this.request(`record/${companyId}/${recordId}`, [],  METHOD_DELETE, userToken);
+    return this.request(`record/${companyId}/${recordId}`, [], METHOD_DELETE, userToken);
   }
 
   /**
@@ -1230,7 +1233,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   putSchedule(companyId, staffId, userToken, fields) {
-    return this.request(`schedule/${companyId}/${staffId}`, fields,  METHOD_PUT, userToken);
+    return this.request(`schedule/${companyId}/${staffId}`, fields, METHOD_PUT, userToken);
   }
 
   /**
@@ -1245,15 +1248,15 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/10/0/0
    * @throws YclientsException
    */
-  getTimetableDates(companyId,   date, staffId, userToken) {
+  getTimetableDates(companyId, date, staffId, userToken) {
     parameters = [];
 
     if (staffId !== null) {
       parameters['staff_id'] = staffId;
     }
 
-    return this.request(`timetable/dates/${companyId}/${date -> format('Y-m-d')}`, parameters,
-       METHOD_GET, userToken);
+    return this.request(`timetable/dates/${companyId}/${format(new Date(date), 'yyyy-MM-dd')}`, parameters,
+      METHOD_GET, userToken);
   }
 
   /**
@@ -1268,9 +1271,9 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/11/0/0
    * @throws YclientsException
    */
-  getTimetableSeances(companyId,   date, staffId, userToken) {
-    return this.request(`timetable/seances/${companyId}/${staffId}/${date -> format('Y-m-d')}`, [],
-       METHOD_GET, userToken);
+  getTimetableSeances(companyId, date, staffId, userToken) {
+    return this.request(`timetable/seances/${companyId}/${staffId}/${format(new Date(date), 'yyyy-MM-dd')}`, [],
+      METHOD_GET, userToken);
   }
 
   /**
@@ -1298,11 +1301,11 @@ class YclientsApi {
     parameters = [];
 
     if (startDate !== null) {
-      parameters['start_date'] = startDate -> format('Y-m-d');
+      parameters['start_date'] = format(new Date(startDate), 'yyyy-MM-dd');
     }
 
     if (endDate !== null) {
-      parameters['end_date'] = endDate -> format('Y-m-d');
+      parameters['end_date'] = format(new Date(endDate), 'yyyy-MM-dd');
     }
 
     if (staffId !== null) {
@@ -1313,7 +1316,7 @@ class YclientsApi {
       parameters['rating'] = rating;
     }
 
-    return this.request(`comments/${companyId}`, parameters,  METHOD_GET, userToken);
+    return this.request(`comments/${companyId}`, parameters, METHOD_GET, userToken);
   }
 
   /**
@@ -1327,7 +1330,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   getCompanyUsers(companyId, userToken) {
-    return this.request(`company_users/${companyId}`, [],  METHOD_GET, userToken);
+    return this.request(`company_users/${companyId}`, [], METHOD_GET, userToken);
   }
 
   /**
@@ -1341,7 +1344,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   getAccounts(companyId, userToken) {
-    return this.request(`accounts/${companyId}`, [],  METHOD_GET, userToken);
+    return this.request(`accounts/${companyId}`, [], METHOD_GET, userToken);
   }
 
   /**
@@ -1361,7 +1364,7 @@ class YclientsApi {
     parameters['client_ids'] = clientIds;
     parameters['text'] = text;
 
-    return this.request(`sms/clients/by_id/${companyId}`, parameters,  METHOD_POST, userToken);
+    return this.request(`sms/clients/by_id/${companyId}`, parameters, METHOD_POST, userToken);
   }
 
   /**
@@ -1375,7 +1378,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   getStorages(companyId, userToken) {
-    return this.request(`storages/${companyId}`, [],  METHOD_GET, userToken);
+    return this.request(`storages/${companyId}`, [], METHOD_GET, userToken);
   }
 
   /**
@@ -1389,7 +1392,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   getHooks(companyId, userToken) {
-    return this.request(`hooks_settings/${companyId}`, [],  METHOD_GET, userToken);
+    return this.request(`hooks_settings/${companyId}`, [], METHOD_GET, userToken);
   }
 
   /**
@@ -1410,7 +1413,7 @@ class YclientsApi {
     if (!isset(fields['active'])) {
       throw new YclientsException('Не передан обязательный параметр active');
     }
-    return this.request(`hooks_settings/${companyId}`, fields,  METHOD_POST, userToken);
+    return this.request(`hooks_settings/${companyId}`, fields, METHOD_POST, userToken);
   }
 }
 
