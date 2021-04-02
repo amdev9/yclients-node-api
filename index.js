@@ -1,6 +1,7 @@
-// const fetch = require("isomorphic-unfetch")
 const fetch = require('node-fetch');
-// const querystring = require("querystring")
+const querystring = require("querystring")
+
+const { format } = require('date-fns')
 
 /*
   * URL для RestAPI
@@ -17,7 +18,6 @@ const METHOD_DELETE = 'DELETE';
 
 class YclientsApi {
   constructor({ tokenPartner = null }) {
-
     /**
      * Токен доступа для авторизации партнёра
      *
@@ -28,35 +28,16 @@ class YclientsApi {
     this.tokenPartner = tokenPartner
   }
 
-
   requestCurl = async (endpoint = "", config = {}) => {
-
-
-    console.log(config)
     let url = URL + endpoint
 
     const response = await fetch(url, config);
     const data = await response.json();
 
     return data
-    // console.log(url, config)
-    // return fetch(url, config).then(r => {
-
-
-    //   console.log(r)
-    //   if (r.ok) {
-    //     console.log(r.json())
-    //     return r.json()
-    //   }
-    //   // throw new Error(r)
-    // })
-
   }
 
   request(url, parameters, method = 'GET', auth = true) {
-
-
-    console.log(parameters)
     let headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/vnd.yclients.v2+json'
@@ -77,18 +58,22 @@ class YclientsApi {
 
     let options = {
       'method': method,
-      'body': JSON.stringify(parameters),
       headers,
     }
 
-    // const additionalParams =  parameters ? "?" + querystring.stringify( parameters) : ""
+    const additionalParams = parameters ? "?" + querystring.stringify(parameters) : ""
+
     let endpoint = url
-    // + additionalParams
 
-
-    console.log('head ', headers)
+    if (method === METHOD_GET) {
+      endpoint = endpoint + additionalParams
+    } else {
+      options = {
+        ...options,
+        'body': JSON.stringify(parameters),
+      }
+    }
     return this.requestCurl(endpoint, options);
-
   }
 
 
@@ -158,7 +143,7 @@ class YclientsApi {
     serviceIds = null,
     eventIds = null
   ) {
-    parameters = [];
+    let parameters = {};
 
     if (staffId !== null) {
       parameters['staff_id'] = staffIBd;
@@ -208,7 +193,7 @@ class YclientsApi {
     eventIds = null, // array 
     withoutSeances = false
   ) {
-    parameters = [];
+    let parameters = {};
 
     if (staffId !== null) {
       parameters['staff_id'] = staffId;
@@ -257,7 +242,7 @@ class YclientsApi {
     date = null, //  
     eventIds = null // array
   ) {
-    parameters = [];
+    let parameters = {};
 
     if (staffId !== null) {
       parameters['staff_id'] = staffId;
@@ -302,7 +287,7 @@ class YclientsApi {
     serviceIds = null, // array
     eventIds = null // array
   ) {
-    parameters = [];
+    let parameters = {};
 
     if (serviceIds !== null) {
       parameters['service_ids'] = serviceIds;
@@ -359,7 +344,11 @@ class YclientsApi {
   postBookCheck(companyId, appointments) {
     // проверим наличие обязательных параметров
     appointments.map(appointment => {
-      if (!isset(appointment['id'], appointment['staff_id'], appointment['datetime'])) {
+      if (
+        typeof appointment['id'] === 'undefined' ||
+        typeof appointment['staff_id'] === 'undefined' ||
+        typeof appointment['datetime'] === 'undefined'
+      ) {
         throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
       }
     })
@@ -401,7 +390,7 @@ class YclientsApi {
     comment = null,
     apiId = null
   ) {
-    parameters = [];
+    let parameters = {};
 
     // проверим наличие обязательных параметров клиента
     if (!isset(person['phone'], person['fullname'], person['email'])) {
@@ -536,7 +525,7 @@ class YclientsApi {
       trigger_error('getCompanies() expected Argument 6 if set Argument 5', E_USER_WARNING);
     }
 
-    parameters = [];
+    let parameters = {};
 
     if (groupId !== null) {
       parameters['group_id'] = groupId;
@@ -1417,20 +1406,4 @@ class YclientsApi {
   }
 }
 
-const api = new YclientsApi({
-  tokenPartner: "5uuwjsb8pfzf54ddkmdm"
-})
-
-api
-  .getAuth({ "login": "amatveevdev9@gmail.com", "password": "txxta6" })
-  .then(data => console.log(data))
-  .catch((error) => {
-    console.log(error.stack)
-  });
-
-
-api.getBookform('466816')
-  .then(data => console.log(data))
-  .catch((error) => {
-    console.log(error.stack)
-  });
+exports.YclientsApi = YclientsApi
