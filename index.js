@@ -533,12 +533,12 @@ class YclientsApi {
     active = null,
     moderated = null,
     forBooking = null,
-    my = null,
+    my = 1,
     userToken = null
   ) {
-    if (my && !userToken) {
-      trigger_error('getCompanies() expected Argument 6 if set Argument 5', E_USER_WARNING);
-    }
+    // if (my && !userToken) {
+    //   throw Error('getCompanies() expected Argument 6 if set Argument 5');
+    // }
 
     let parameters = {};
 
