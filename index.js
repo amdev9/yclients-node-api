@@ -353,7 +353,9 @@ class YclientsApi {
       }
     })
 
-    return this.request(`book_check/${companyId}`, appointments, METHOD_POST);
+    parameters['appointments'] = appointments;
+    
+    return this.request(`book_check/${companyId}`, parameters, METHOD_POST);
   }
 
   /**
