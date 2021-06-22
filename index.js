@@ -342,6 +342,7 @@ class YclientsApi {
    * @throws YclientsException
    */
   postBookCheck(companyId, appointments) {
+    let parameters = {};
     // проверим наличие обязательных параметров
     appointments.map(appointment => {
       if (
