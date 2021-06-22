@@ -393,20 +393,30 @@ class YclientsApi {
     let parameters = {};
 
     // проверим наличие обязательных параметров клиента
-    if (!isset(person['phone'], person['fullname'], person['email'])) {
+    // // !isset(person['phone'], person['fullname'], person['email'])) 
+    if (
+      typeof person['phone'] === 'undefined' ||
+      typeof person['fullname'] === 'undefined' ||
+      typeof person['email'] === 'undefined'
+    ) {
       throw new YclientsException('Клиент должен содержать все обязательные поля: phone, fullname, email.');
     }
 
-    parameters = array_merge(parameters, person);
+    parameters = Object.assign({}, parameters, person);
 
-    if (!count(appointments)) {
+    if (appointments.length === 0) {
       throw new YclientsException('Должна быть хотя бы одна запись.');
     }
 
     // проверим наличие обязательных параметров записей
 
     appointments.map(appointment => {
-      if (!isset(appointment['id'], appointment['staff_id'], appointment['datetime'])) {
+      if (
+        typeof appointment['id'] === 'undefined' ||
+        typeof appointment['staff_id'] === 'undefined' ||
+        typeof appointment['datetime'] === 'undefined'
+        // !isset(appointment['id'], appointment['staff_id'], appointment['datetime'])
+      ) {
         throw new YclientsException('Запись должна содержать все обязательные поля: id, staff_id, datetime.');
       }
     })
@@ -414,10 +424,12 @@ class YclientsApi {
     parameters['appointments'] = appointments;
 
     if (notify) {
-      if (isset(notify['notify_by_sms'])) {
+
+  
+      if (notify['notify_by_sms'] !== 'undefined') { //isset(notify['notify_by_sms']
         parameters['notify_by_sms'] = notify['notify_by_sms'];
       }
-      if (isset(notify['notify_by_email'])) {
+      if (notify['notify_by_email'] !== 'undefined') { //isset(notify['notify_by_email']
         parameters['notify_by_email'] = notify['notify_by_email'];
       }
     }
@@ -496,7 +508,7 @@ class YclientsApi {
     }
 
     return this.request(`user/records/${recordId}/${recordHash}`, [], METHOD_DELETE)
-      // userToken ?: true);
+    // userToken ?: true);
   }
 
   /**
