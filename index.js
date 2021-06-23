@@ -453,6 +453,34 @@ class YclientsApi {
   }
 
   /**
+   * Перенести запись на сеанс
+   *
+   * @param integer  companyId
+   
+   * @access public
+   * @see http://docs.yclients.apiary.io/#reference/-/8/0
+   * @throws YclientsException
+   */
+   putBookRecord(
+    companyId,
+    recordId,
+    datetime = null,
+    comment = null,
+  ) {
+    let parameters = {};
+
+    if (datetime !== null) {
+      parameters['datetime'] = datetime;
+    }
+
+    if (comment !== null) {
+      parameters['comment'] = comment;
+    }
+
+    return this.request(`book_record/${companyId}/${recordId}`, parameters, METHOD_PUT);
+  }
+
+  /**
    * Авторизоваться по номеру телефона и коду
    *
    * @param string  phone - Телефон, на который будет отправлен код вида 79161005050
