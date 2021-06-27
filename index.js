@@ -1423,9 +1423,12 @@ class YclientsApi {
    * @see http://docs.yclients.apiary.io/#reference/18/0/0
    * @throws YclientsException
    */
-  getHooks(companyId, userToken) {
-    return this.request(`hooks_settings/${companyId}`, [], METHOD_GET, userToken);
+   getHooks(companyId, userToken) {
+
+    console.log(`settings/web_hook/${companyId}`, [], METHOD_GET, userToken)
+    return this.request(`settings/web_hook/${companyId}`, [], METHOD_GET, userToken);
   }
+
 
   /**
    * Изменить настройки уведомлений о событиях
@@ -1439,13 +1442,13 @@ class YclientsApi {
    * @throws YclientsException
    */
   postHooks(companyId, fields, userToken) {
-    if (!isset(fields['url'])) {
+    if (fields['urls'] === undefined) {
       throw new YclientsException('Не передан обязательный параметр url');
     }
-    if (!isset(fields['active'])) {
+    if (fields['active'] === undefined) {
       throw new YclientsException('Не передан обязательный параметр active');
     }
-    return this.request(`hooks_settings/${companyId}`, fields, METHOD_POST, userToken);
+    return this.request(`settings/web_hook/${companyId}`, fields, METHOD_POST, userToken);
   }
 }
 
